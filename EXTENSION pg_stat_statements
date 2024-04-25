@@ -1,0 +1,26 @@
+1) Edit file postgresql.conf and add the next 3 lines (any where):
+
+shared_preload_libraries = 'pg_stat_statements'
+pg_stat_statements.max = 10000
+pg_stat_statements.track = all
+
+2) Restart PostgreSQL
+
+3) Execute the next command on psql, pgAdmin or similar:
+
+CREATE EXTENSION pg_stat_statements;
+
+4) Checking some results:
+
+SELECT query, calls, total_time, rows, 100.0 * shared_blks_hit / nullif(shared_blks_hit + shared_blks_read, 0) AS hit_percent FROM pg_stat_statements ORDER BY total_time DESC LIMIT 5;
+
+SELECT 
+  (total_time / 1000 / 60) as total_minutes, 
+  (total_time/calls) as average_time, 
+  query 
+FROM pg_stat_statements 
+ORDER BY 1 DESC 
+LIMIT 100;
+
+5) More information:
+http://www.postgresql.org/docs/9.4/static/pgstatstatements.html
